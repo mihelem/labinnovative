@@ -62,6 +62,6 @@ In the folder `infer-out/specs` you can find the specifics of each function/meth
 Command | Purpose
 ---|---
 `infer report` | pretty print `.specs` file
-  `--from-json-report` | option to read from the json reports (todo)
+  `--from-json-report` | how to use this @a-liut @lapotolo
 `infer explore` | explore reports, useful when they are > 10
   
