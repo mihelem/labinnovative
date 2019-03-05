@@ -11,7 +11,7 @@ From an industrial point of view, the revolutionary side of Infer was
 
       COMPOSITIONALITY/MODULARITY + INCREMENTAL ANALYSIS
 Infer is analysing each function/method, following an order compatible with the call-graph to allow for intra-procedural analysis
-In theory we should be able to see the callgraph in folder `infer-out/captured` as described in the online manual, but the folder is not created, maybe the sql file substituted the .cfg, .cg, .tenv files?
+In theory we should be able to see the callgraph in folder `infer-out/captured` as described in the online manual. Actually to retrieve such information if we ask infer to print the `.dot` files, e.g. directly by `--write-dotty` or implicitly by `--debug`, the `.dot` files will be in `infer-out/captured/<name>/` folder, in particular we have the control flow graph `icfg.dot`.
 
 The analysis of each function/method is blocked after an error is found, in the spirit of `incremental development`: fix the bug, then continue with the analysis.
 As a side note, they tested how many bugs were fixed by developers with a *countinuous development tool* **VS** *batch tool* furnishing bugs the next morning, and found out 70% VS 0%.
@@ -63,4 +63,5 @@ Command | Purpose
 ---|---
 `infer report` | pretty print `.specs` file
   `--from-json-report` | option to read from the json reports (todo)
+`infer explore` | explore reports, useful when they are > 10
   
