@@ -45,6 +45,7 @@ infer capture --reactive -- make -j 4
 infer analyze --reactive --changed-files-index index.txt
 infer reportdiff --report-current report-feature.json --report-previous infer-out/report.json
  ```
+At the end of the process, you will find in the folder `infer-out/differential`, the 3 report files `[fixed\|introduced\|preexisting].json`, with obvious name meaning in relation to bugs finding. A full example is detailed [here](./diff_mh.md), stressing how the diff of the two reports is not considering the fact that the same checkers were active or not.
  
 
 #### KEEP IN MIND
@@ -53,7 +54,7 @@ Personally, I would use it for SAFETY-CRITICAL applications only as a first appr
 In that spirit, *bugs* are *heuristically filtered* by default, sometimes filtering out even very simple but ugly errors, as shown in `esempio001.c`.
 You can disable the filtering with the option `--no-filtering`
 
-### WHAT IS INFER CAPABLE OF!
+### WHAT IS INFER CAPABLE OF?(!)
 Check your own tests, anyway you can find plenty of them in  
 
   https://github.com/facebook/infer/tree/master/infer/tests
