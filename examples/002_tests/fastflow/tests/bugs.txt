@@ -1,0 +1,129 @@
+Found 15 issues
+
+test_lb_affinity.cpp:64: error: MEMORY_LEAK
+  memory dynamically allocated by call to `malloc()` at line 73, column 49 is not reachable after line 64, column 43.
+  62.               for (int j = 0; j < INBUF_Q_SIZE; j++) {
+  63.                   for (int i = 0; i < NWORKERS; i++) {
+  64. >                     size_t targetworker = workers[i]->get_my_id();
+  65.                       //
+  66.                       // NOTE: in order to use the following low-level call, you must be sure that the 
+
+test_lb_affinity.cpp:74: error: NULL_DEREFERENCE
+  pointer `worker_task` last assigned on line 73 could be null and is dereferenced at line 74, column 21.
+  72.                       // numa_malloc(sizeof(ff_task_t),mnode)
+  73.                       worker_task = (ff_task_t *) malloc(sizeof(ff_task_t));
+  74. >                     worker_task->sourceW = targetworker;
+  75.                       // here danger of race condition
+  76.                       // only static information can be used
+
+test_torus2.cpp:67: error: NULL_DEREFERENCE
+  pointer `msg` last assigned on line 66 could be null and is dereferenced at line 67, column 9.
+  65.           char* buf = (char*)MALLOC(sizeof(unsigned int)*(size+1));
+  66.           unsigned int *msg = (unsigned int*)buf;
+  67. >         msg[0] = size;
+  68.           msg += 1;
+  69.           for (unsigned int k=0; k<size; ++k) msg[k] = counter_out++;
+
+test_blk3.cpp:72: error: DEAD_STORE
+  The value written to &t (type fftask_t*) is never used.
+  70.           for(size_t i=1;i<=numtasks;++i) {
+  71.               
+  72. >             t = new fftask_t(1,i%10);
+  73.               t = new (MALLOC(sizeof(fftask_t))) fftask_t(1,i%10);
+  74.   
+
+test_dataflow2.cpp:100: error: DEAD_STORE
+  The value written to &t (type fftask_t*) is never used.
+  98.           for(long i=1;i<=numtasks;++i) {
+  99.               
+  100. >             t = new fftask_t(1,i%10);
+  101.               t = new (MALLOC(sizeof(fftask_t))) fftask_t(1,i%10);
+  102.               
+
+test_uBuffer.cpp:165: error: MEMORY_LEAK
+  memory dynamically allocated by call to `malloc()` at line 145, column 24 is not reachable after line 165, column 19.
+  163.           do ; while(!(b->mpush(p)));
+  164.     #else 
+  165. > 	    do ; while(!(b->push(p)));
+  166.     #endif
+  167.    #endif // TWO_LOCK
+
+test_accelerator+pinning.cpp:185: error: USE_AFTER_FREE
+  pointer `*returned by operator[]` was freed by call to `delete()` at line 185, column 7 and is dereferenced or freed at line 185, column 7.
+  183.     void svc_end() {
+  184.       for(unsigned int i=0; i<n_simulations; ++i)
+  185. >       delete sq[i];
+  186.       delete tq;
+  187.       delete sizes;
+
+test_accelerator+pinning.cpp:204: error: MEMORY_LEAK
+  memory dynamically allocated to `ptime` by call to `malloc()` at line 202, column 33 is not reachable after line 204, column 7.
+  202.         double *ptime = (double *)malloc(sizeof(double));
+  203.         *ptime = sample_time;
+  204. >       tq->push(ptime);
+  205.         newest_sample_time = sample_time;
+  206.       }
+
+test_accelerator+pinning.cpp:203: error: NULL_DEREFERENCE
+  pointer `ptime` last assigned on line 202 could be null and is dereferenced at line 203, column 7.
+  201.       if(sample_time > newest_sample_time) {
+  202.         double *ptime = (double *)malloc(sizeof(double));
+  203. >       *ptime = sample_time;
+  204.         tq->push(ptime);
+  205.         newest_sample_time = sample_time;
+
+test_uBuffer.cpp:307: error: DANGLING_POINTER_DEREFERENCE
+  uninitialized pointer `t` last assigned on line 306 could be dangling and is dereferenced or freed at line 307, column 11.
+  305.           for(register int j=0;j<8;++j) {
+  306.               long * t = (long *)task.b;
+  307. > 		    if (t[j]!=(k+j)) {
+  308.   			std::cerr << " ERROR, value is " << t[j] << " should be " << k+j << "\n";
+  309.   		    } else t[j]++; // just write in the array
+
+test_accelerator+pinning.cpp:304: error: USE_AFTER_FREE
+  pointer `*returned by operator[]` was freed by call to `delete()` at line 304, column 2 and is dereferenced or freed at line 304, column 2.
+  302.       if(begin != -1)
+  303.         for(int i=begin; i!=end; i=(i+1)%window_size) {
+  304. > 	delete window[i];
+  305.   	delete window_times[i];
+  306.         }
+
+test_accelerator+pinning.cpp:305: error: USE_AFTER_FREE
+  pointer `*returned by operator[]` was freed by call to `delete()` at line 305, column 2 and is dereferenced or freed at line 305, column 2.
+  303.         for(int i=begin; i!=end; i=(i+1)%window_size) {
+  304.   	delete window[i];
+  305. > 	delete window_times[i];
+  306.         }
+  307.     }
+
+test_accelerator+pinning.cpp:362: error: USE_AFTER_FREE
+  pointer `*returned by operator[]` was freed by call to `delete()` at line 362, column 7 and is dereferenced or freed at line 362, column 7.
+  360.     void svc_end() {
+  361.       for(int i=0; i<n_monitors; ++i)
+  362. >       delete stat_windows[i];
+  363.     }
+  364.   
+
+test_accelerator+pinning.cpp:499: error: USE_AFTER_FREE
+  pointer `*returned by at` was freed by call to `delete()` at line 499, column 7 and is dereferenced or freed at line 499, column 7.
+  497.       for(int i=0; i<n_monitors; ++i) {
+  498.         stat_windows->at(i)->free_all();
+  499. >       delete stat_windows->at(i);
+  500.       }
+  501.       delete stat_windows;
+
+test_accelerator+pinning.cpp:512: error: USE_AFTER_FREE
+  pointer `*returned by at` was freed by call to `delete()` at line 512, column 2 and is dereferenced or freed at line 512, column 2.
+  510.         for(int i=0; i<n_monitors; ++i) {
+  511.   	stat_windows->at(i)->free_oldest();
+  512. > 	delete stat_windows->at(i);
+  513.         }
+  514.         delete stat_windows;
+
+Summary of the reports
+
+                USE_AFTER_FREE: 6
+                   MEMORY_LEAK: 3
+              NULL_DEREFERENCE: 3
+                    DEAD_STORE: 2
+  DANGLING_POINTER_DEREFERENCE: 1
