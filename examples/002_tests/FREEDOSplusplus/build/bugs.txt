@@ -1,0 +1,1034 @@
+Found 128 issues
+
+fdpp/newstuff.cc:61: error: NULL_DEREFERENCE
+  pointer `returned by operator_unsigned_char_*` could be null and is dereferenced by call to `memcpy()` at line 61, column 3.
+  59.     i = ppsp->ps_maxfiles;
+  60.     /* copy existing part and fill up new part by "no open file" */
+  61. >   fmemcpy(newtab, ppsp->ps_filetab, i);
+  62.     fmemset(newtab + i, 0xff, nHandles - i);
+  63.   
+
+fdpp/newstuff.cc:62: error: NULL_DEREFERENCE
+  pointer `returned by operator_unsigned_char_*` could be null and is dereferenced by call to `memset()` at line 62, column 3.
+  60.     /* copy existing part and fill up new part by "no open file" */
+  61.     fmemcpy(newtab, ppsp->ps_filetab, i);
+  62. >   fmemset(newtab + i, 0xff, nHandles - i);
+  63.   
+  64.     ppsp->ps_maxfiles = nHandles;
+
+fdpp/network.cc:43: error: NULL_DEREFERENCE
+  pointer `returned by operator_char_**` could be null and is dereferenced by call to `memcpy()` at line 43, column 3.
+  41.   UWORD get_machine_name(__FAR(char) netname)
+  42.   {
+  43. >   fmemcpy(netname, &net_name, 16);
+  44.     return (NetBios);
+  45.   }
+
+fdpp/smalloc.c:59: error: DEAD_STORE
+  The value written to &pos (type int) is never used.
+  57.               mp->size - mp->avail);
+  58.       DO_PRN("Largest free area: %zi\n", smget_largest_free_area(mp));
+  59. >     DO_PRN("Memory pool dump:\n");
+  60.       for (mn = &mp->mn; mn; mn = mn->next)
+  61.           DO_PRN("\tarea: %zi bytes, %s\n",
+
+fdpp/smalloc.c:61: error: DEAD_STORE
+  The value written to &pos (type int) is never used.
+  59.       DO_PRN("Memory pool dump:\n");
+  60.       for (mn = &mp->mn; mn; mn = mn->next)
+  61. >         DO_PRN("\tarea: %zi bytes, %s\n",
+  62.                   mn->size, mn->used ? "used" : "free");
+  63.   }
+
+fdpp/network.cc:50: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced by call to `memcpy()` at line 50, column 3.
+  48.   {
+  49.     NetBios = name_num;
+  50. >   fmemcpy(&net_name, netname, 15);
+  51.     net_set_count++;
+  52.   }
+
+fdpp/dyninit.cc:76: error: NULL_DEREFERENCE
+  pointer `returned by operator_void_*` could be null and is dereferenced by call to `memset()` at line 76, column 3.
+  74.   
+  75.     now = (__FAR(void))&Dynp->Buffer[Dynp->Allocated];
+  76. >   fmemset(now, 0, total);
+  77.   
+  78.     Dynp->Allocated += total;
+
+fdpp/sysclk.cc:112: error: NULL_DEREFERENCE
+  pointer `returned by operator_char_*` could be null and is dereferenced by call to `memcpy()` at line 112, column 9.
+  110.             return failure(E_LENGTH);
+  111.   
+  112. >         fmemcpy(&clk, rp->r_trans, sizeof(struct ClockRecord));
+  113.   
+  114.           /* Set PC Clock first                                   */
+
+fdpp/sysclk.cc:98: error: NULL_DEREFERENCE
+  pointer `returned by operator_char_*` could be null and is dereferenced by call to `memcpy()` at line 98, column 9.
+  96.           clk.clkDays = DaysSinceEpoch;
+  97.   
+  98. >         fmemcpy(rp->r_trans, &clk, sizeof(struct ClockRecord));
+  99.         }
+  100.         return S_DONE;
+
+fdpp/sysclk.cc:154: error: UNINITIALIZED_VALUE
+  The value read from clk.clkHours was never initialized.
+  152.           DayToBcd(bcd_days, Month, Day, Year);
+  153.           bcd_minutes = ByteToBcd(clk.clkMinutes);
+  154. >         bcd_hours = ByteToBcd(clk.clkHours);
+  155.           bcd_seconds = ByteToBcd(clk.clkSeconds);
+  156.           WriteATClock(bcd_days, bcd_hours, bcd_minutes, bcd_seconds);
+
+fdpp/sysclk.cc:153: error: UNINITIALIZED_VALUE
+  The value read from clk.clkMinutes was never initialized.
+  151.   
+  152.           DayToBcd(bcd_days, Month, Day, Year);
+  153. >         bcd_minutes = ByteToBcd(clk.clkMinutes);
+  154.           bcd_hours = ByteToBcd(clk.clkHours);
+  155.           bcd_seconds = ByteToBcd(clk.clkSeconds);
+
+fdpp/sysclk.cc:155: error: UNINITIALIZED_VALUE
+  The value read from clk.clkSeconds was never initialized.
+  153.           bcd_minutes = ByteToBcd(clk.clkMinutes);
+  154.           bcd_hours = ByteToBcd(clk.clkHours);
+  155. >         bcd_seconds = ByteToBcd(clk.clkSeconds);
+  156.           WriteATClock(bcd_days, bcd_hours, bcd_minutes, bcd_seconds);
+  157.         }
+
+fdpp/newstuff.cc:81: error: NULL_DEREFERENCE
+  pointer `returned by operator_char_*` could be null and is dereferenced at line 81, column 7.
+  79.     if (os_major == 5) { /* clone some bad habit of MS DOS 5.0 only */
+  80.       if (ptmp == pathname || (ptmp[-1] != '\\' && ptmp[-1] != '/'))
+  81. >       *ptmp++ = '\\';
+  82.     }
+  83.     ptmp[8] = '\0';
+
+fdpp/newstuff.cc:78: error: NULL_DEREFERENCE
+  pointer `returned by operator_char_*` could be null and is dereferenced by call to `strlen()` at line 78, column 21.
+  76.     int loop;
+  77.   
+  78. >   ptmp = pathname + fstrlen(pathname);
+  79.     if (os_major == 5) { /* clone some bad habit of MS DOS 5.0 only */
+  80.       if (ptmp == pathname || (ptmp[-1] != '\\' && ptmp[-1] != '/'))
+
+fdpp/main.cc:74: error: STATIC_INITIALIZATION_ORDER_FIASCO
+  Initializer of LoL accesses global variable from a different translation unit: __DATASTART|.
+  72.   #endif
+  73.   
+  74. > ASMREF(struct lol) LoL = __ASMADDR(DATASTART);
+  75.   
+  76.   VOID ASMCFUNC FreeDOSmain(void)
+
+fdpp/main.cc:105: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 105, column 9.
+  103.                           */
+  104.   
+  105. >   drv = LoL->_BootDrive + 1;
+  106.     p = (__FAR(unsigned char))MK_FP(0, 0x5e0);
+  107.     if (fmemcmp(p+2,"CONFIG",6) == 0)      /* UPX */
+
+fdpp/main.cc:117: error: NULL_DEREFERENCE
+  pointer `returned by operator__KernelConfig_*` could be null and is dereferenced by call to `memcpy()` at line 117, column 5.
+  115.     {
+  116.       *p = drv - 1;
+  117. >     fmemcpy_n(&InitKernelConfig, &LowKernelConfig, sizeof(InitKernelConfig));
+  118.     }
+  119.   
+
+fdpp/blockio.cc:141: error: DEAD_STORE
+  The value written to &_s (type unsigned short) is never used.
+  139.     else
+  140.     {
+  141. >     bp = b_prev(bufptr(firstbp));
+  142.     }
+  143.   
+
+fdpp/fcbfns.cc:105: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced at line 105, column 7.
+  103.     /* If drive specified, set to it (when valid) otherwise         */
+  104.     /* set to default drive unless leave as-is requested            */
+  105. >   if (*(lpFileName + 1) == ':')
+  106.     {
+  107.       /* non-portable construct to be changed                 */
+
+fdpp/fcbfns.cc:95: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced at line 95, column 12.
+  93.     if (*wTestMode & PARSE_SKIP_LEAD_SEP)
+  94.     {
+  95. >     while (TestCmnSeps(lpFileName))
+  96.         ++lpFileName;
+  97.     }
+
+fdpp/systime.cc:108: error: NULL_DEREFERENCE
+  pointer `returned by operator_request_*` could be null and is dereferenced by call to `char_error()` at line 108, column 12.
+  106.   
+  107.     if (ClkReqHdr.r_status & S_ERROR)
+  108. >     return char_error(&ClkReqHdr, (__FAR(struct dhdr))_clock_);
+  109.     return SUCCESS;
+  110.   }
+
+fdpp/smalloc.c:127: error: NULL_DEREFERENCE
+  pointer `mp` could be null and is dereferenced at line 127, column 2.
+  125.       int ok = __sm_commit(mp, addr, size, e_addr, e_size);
+  126.       if (ok) {
+  127. > 	assert(mp->avail >= size);
+  128.   	mp->avail -= size;
+  129.       }
+
+fdpp/strings.cc:135: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced at line 135, column 9.
+  133.     do
+  134.     {
+  135. >     if (*++p == (char)c)
+  136.         return (__FAR(char))p;
+  137.     }
+
+fdpp/smalloc.c:145: error: NULL_DEREFERENCE
+  pointer `pmn` could be null and is dereferenced at line 145, column 7.
+  143.       return;
+  144.     /* delta can be < 0 */
+  145. >   if (pmn->next && !pmn->next->used) {
+  146.       struct memnode *nmn = pmn->next;
+  147.   
+
+fdpp/main.cc:156: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 156, column 35.
+  154.     static char filename[] = "A:-@JUNK@-.TMP";
+  155.     int drive, fileno;
+  156. >   for (drive = 'C'; drive < 'A' + LoL->_nblkdev; drive++)
+  157.     {
+  158.       filename[0] = drive;
+
+fdpp/systime.cc:173: error: NULL_DEREFERENCE
+  pointer `returned by operator_request_*` could be null and is dereferenced by call to `char_error()` at line 173, column 12.
+  171.   
+  172.     if (ClkReqHdr.r_status & S_ERROR)
+  173. >     return char_error(&ClkReqHdr, (__FAR(struct dhdr))_clock_);
+  174.     return SUCCESS;
+  175.   }
+
+fdpp/strings.cc:161: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_unsigned_char_*` could be null and is dereferenced at line 161, column 9.
+  159.     while (n--)
+  160.     {
+  161. >     if (*p == (unsigned char)c)
+  162.         return (__FAR(void))p;
+  163.       p++;
+
+fdpp/fatdir.cc:214: error: NULL_DEREFERENCE
+  pointer `returned by operator_unsigned_char_*` could be null and is dereferenced by call to `memcpy()` at line 214, column 3.
+  212.   
+  213.     fnp->f_diridx = entry % (secsize / DIRENT_SIZE);
+  214. >   getdirent(&bp->b_buffer[fnp->f_diridx * DIRENT_SIZE], &fnp->f_dir);
+  215.   
+  216.     swap_deleted(fnp->f_dir.dir_name);
+
+fdpp/dsk.cc:170: error: NULL_DEREFERENCE
+  pointer `pddt2` last assigned on line 167 could be null and is dereferenced at line 170, column 32.
+  168.       for (i = 0; i < blk_dev.dh_name[0]; i++, pddt2++)
+  169.       {
+  170. >       if (pddt->ddt_driveno == pddt2->ddt_driveno &&
+  171.             (pddt2->ddt_descflags & (DF_MULTLOG | DF_CURLOG)) ==
+  172.             (DF_MULTLOG | DF_CURLOG))
+
+fdpp/dsk.cc:185: error: UNINITIALIZED_VALUE
+  The value read from dx.x was never initialized.
+  183.         dx.b.h = pddt2->ddt_logdriveno;
+  184.         /* call int2f/ax=4a00 */
+  185. >       if (floppy_change(dx.x) != 0xffff) {
+  186.           /* if someone else does not make a nice dialog... */
+  187.           template_string[DRIVE_POS] = 'A' + pddt2->ddt_logdriveno;
+
+fdpp/fattab.cc:332: error: NULL_DEREFERENCE
+  pointer `returned by operator_unsigned_int_*` could be null and is dereferenced at line 332, column 18.
+  330.       /* form an index so that we can read the block as a     */
+  331.       /* byte array                                           */
+  332. >     UDWORD res = fgetlong(&bp->b_buffer[idx * 4]) & LONG_LAST_CLUSTER;
+  333.       if (Cluster2 == READ_CLUSTER)
+  334.       {
+
+fdpp/fcbfns.cc:167: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced at line 167, column 10.
+  165.   __FAR(const char) ParseSkipWh(__FAR(const char) lpFileName)
+  166.   {
+  167. >   while (*lpFileName == ' ' || *lpFileName == '\t')
+  168.       ++lpFileName;
+  169.     return lpFileName;
+
+fdpp/fcbfns.cc:179: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced at line 179, column 10.
+  177.     BYTE cFill = ' ';
+  178.   
+  179. >   while (*lpFileName != '\0' && !TestFieldSeps(lpFileName)
+  180.            && nIndex < nFieldSize)
+  181.     {
+
+fdpp/fcbfns.cc:195: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced at line 195, column 33.
+  193.   
+  194.       /* store uppercased character, and advance to next char       */
+  195. >     *lpDestField++ = DosUpFChar(*lpFileName++);
+  196.       ++nIndex;
+  197.     }
+
+fdpp/chario.cc:193: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced at line 193, column 34.
+  191.     {
+  192.       int err;
+  193. >     unsigned char count = 1, c = *bp++;
+  194.   
+  195.       if (c == CTL_Z)
+
+fdpp/task.cc:188: error: NULL_DEREFERENCE
+  pointer `returned by operator_void_*` could be null and is dereferenced by call to `memcpy()` at line 188, column 3.
+  186.     __FAR(psp)p = MK_FP(para, 0);
+  187.   
+  188. >   fmemcpy(p, MK_FP(cur_psp, 0), sizeof(psp));
+  189.   
+  190.     /* terminate address                                    */
+
+fdpp/parsers/thunk_gen.y:208: error: DEAD_STORE
+  The value written to &flg (type int) is never used.
+  206.   	add_flg(buf, "_TFLG_NORET", flg++);
+  207.       if (!flg)
+  208. > 	add_flg(buf, "_TFLG_NONE", flg++);
+  209.       return buf;
+  210.   }
+
+fdpp/smalloc.c:218: error: NULL_DEREFERENCE
+  pointer `mn` could be null and is dereferenced at line 218, column 3.
+  216.     if (!sm_commit_simple(mp, mn->mem_area, size))
+  217.       return NULL;
+  218. >   mn->used = 1;
+  219.     mntruncate(mn, size);
+  220.     assert(mn->size == size);
+
+fdpp/thunks.cc:238: error: NULL_DEREFERENCE
+  pointer `asm_tab` last assigned on line 237 could be null and is dereferenced by call to `memcpy()` at line 238, column 5.
+  236.       free(asm_tab);
+  237.       asm_tab = (struct asm_dsc_s *)malloc(symtab->calltab_len);
+  238. >     memcpy(asm_tab, resolve_segoff(symtab->calltab), symtab->calltab_len);
+  239.       asm_tab_len = symtab->calltab_len / sizeof(struct asm_dsc_s);
+  240.       /* now relocate */
+
+fdpp/thunks.cc:235: error: NULL_DEREFERENCE
+  pointer `near_wrp` last assigned on line 234 could be null and is dereferenced by call to `memcpy()` at line 235, column 5.
+  233.       free(near_wrp);
+  234.       near_wrp = (struct far_s *)malloc(sizeof(struct far_s) * num_wrps);
+  235. >     memcpy(near_wrp, symtab->near_wrp, sizeof(struct far_s) * num_wrps);
+  236.       free(asm_tab);
+  237.       asm_tab = (struct asm_dsc_s *)malloc(symtab->calltab_len);
+
+fdpp/dsk.cc:243: error: NULL_DEREFERENCE
+  pointer `returned by operator_ddtstruct_*` could be null and is dereferenced by call to `diskchange()` at line 243, column 23.
+  241.     else
+  242.     {
+  243. >     rp->r_mcretcode = diskchange(pddt);
+  244.       if (rp->r_mcretcode == M_DONT_KNOW)
+  245.       {
+
+fdpp/fatdir.cc:260: error: NULL_DEREFERENCE
+  pointer `returned by operator_unsigned_char_*` could be null and is dereferenced at line 260, column 7.
+  258.         /* only update fields that are also in the SFT, for dos_close/commit */
+  259.         fmemcpy(&vp[DIR_NAME], fnp->f_dir.dir_name, FNAME_SIZE + FEXT_SIZE);
+  260. >       fputbyte(&vp[DIR_ATTRIB], fnp->f_dir.dir_attrib);
+  261.         fputword(&vp[DIR_TIME], fnp->f_dir.dir_time);
+  262.         fputword(&vp[DIR_DATE], fnp->f_dir.dir_date);
+
+fdpp/smalloc.c:258: error: DEAD_STORE
+  The value written to &mn (type memnode*) is never used.
+  256.       assert(pmn->mem_area <= mn->mem_area);
+  257.       mntruncate(pmn, pmn->size + mn->size);
+  258. >     mn = pmn;
+  259.     }
+  260.   }
+
+fdpp/nls.cc:243: error: NULL_DEREFERENCE
+  pointer `returned by operator_void_*` could be null and is dereferenced by call to `memcpy()` at line 243, column 5.
+  241.     if (srclen <= dstlen)
+  242.     {
+  243. >     fmemcpy(dst, src, srclen);
+  244.       return SUCCESS;
+  245.     }
+
+fdpp/task.cc:256: error: NULL_DEREFERENCE
+  pointer `returned by operator__cct_*` could be null and is dereferenced by call to `memcpy()` at line 256, column 3.
+  254.   
+  255.     /* complete the psp by adding the command line and FCBs     */
+  256. >   fmemcpy(&_psp->ps_cmd, exb->exec.cmd_line, sizeof(CommandTail));
+  257.     if (FP_OFF(exb->exec.fcb_1) != 0xffff)
+  258.     {
+
+fdpp/task.cc:259: error: NULL_DEREFERENCE
+  pointer `returned by operator__fcb_*` could be null and is dereferenced by call to `memcpy()` at line 259, column 5.
+  257.     if (FP_OFF(exb->exec.fcb_1) != 0xffff)
+  258.     {
+  259. >     fmemcpy(&_psp->ps_fcb1, exb->exec.fcb_1, 16);
+  260.       fmemcpy(&_psp->ps_fcb2, exb->exec.fcb_2, 16);
+  261.     }
+
+fdpp/task.cc:260: error: NULL_DEREFERENCE
+  pointer `returned by operator__fcb_*` could be null and is dereferenced by call to `memcpy()` at line 260, column 5.
+  258.     {
+  259.       fmemcpy(&_psp->ps_fcb1, exb->exec.fcb_1, 16);
+  260. >     fmemcpy(&_psp->ps_fcb2, exb->exec.fcb_2, 16);
+  261.     }
+  262.   
+
+fdpp/task.cc:277: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced at line 277, column 13.
+  275.     for (;;)
+  276.     {
+  277. >     switch (*fnam++)
+  278.       {
+  279.         case '\0':
+
+fdpp/nls.cc:272: error: NULL_DEREFERENCE
+  pointer `returned by operator_unsigned_char_*` could be null and is dereferenced at line 272, column 16.
+  270.       do
+  271.       {
+  272. >       if ((c = *str) >= 'a' && c <= 'z')
+  273.           *str += 'A' - 'a';
+  274.         else if (c > 0x7f)
+
+fdpp/dsk.cc:287: error: NULL_DEREFERENCE
+  pointer `pddt2` last assigned on line 284 could be null and is dereferenced at line 287, column 30.
+  285.     for (i = 0; i < blk_dev.dh_name[0]; i++, pddt2++)
+  286.     {
+  287. >     if (pddt->ddt_driveno == pddt2->ddt_driveno &&
+  288.           (pddt2->ddt_descflags & (DF_MULTLOG | DF_CURLOG)) ==
+  289.           (DF_MULTLOG | DF_CURLOG))
+
+fdpp/chario.cc:291: error: NULL_DEREFERENCE
+  pointer `returned by operator_char_*` could be null and is dereferenced at line 291, column 5.
+  289.       if (c == 256)
+  290.         break;
+  291. >     *bp++ = c;
+  292.       xfer++;
+  293.       if ((unsigned char)c == CTL_Z)
+
+fdpp/fatdir.cc:322: error: NULL_DEREFERENCE
+  pointer `dmp` last assigned on line 288 could be null and is dereferenced at line 322, column 3.
+  320.   
+  321.     /* Now further initialize the dirmatch structure.       */
+  322. >   dmp->dm_drive = name[0] - 'A';
+  323.     dmp->dm_attr_srch = attr;
+  324.   
+
+fdpp/main.cc:302: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 302, column 27.
+  300.     COUNT i;
+  301.   
+  302. >   LoL->_os_setver_major = LoL->_os_major = MAJOR_RELEASE;
+  303.     LoL->_os_setver_minor = LoL->_os_minor = MINOR_RELEASE;
+  304.   
+
+fdpp/chario.cc:339: error: UNINITIALIZED_VALUE
+  The value read from c was never initialized.
+  337.       c = read_char(sft_in, sft_out, FALSE);
+  338.     }
+  339. >   return c;
+  340.   }
+  341.   
+
+fdpp/task.cc:343: error: NULL_DEREFERENCE
+  pointer `returned by operator_unsigned_short_*` could be null and is dereferenced at line 343, column 3.
+  341.     /* mode == LOAD */
+  342.     exp->exec.stack -= 2;
+  343. >   *((__FAR(UWORD))(exp->exec.stack)) = fcbcode;
+  344.     return SUCCESS;
+  345.   }
+
+fdpp/smalloc.c:336: error: NULL_DEREFERENCE
+  pointer `nmn` could be null and is dereferenced at line 336, column 14.
+  334.         if (!sm_commit_simple(mp, nmn->mem_area, size - mn->size))
+  335.           return NULL;
+  336. >       memset(nmn->mem_area, 0, size - mn->size);
+  337.         mntruncate(mn, size);
+  338.       } else {
+
+fdpp/inithma.cc:343: error: NULL_DEREFERENCE
+  pointer `returned by operator_unsigned_char_*` could be null and is dereferenced by call to `memcpy()` at line 343, column 5.
+  341.     if (NewKernelSegment < CurrentKernelSegment ||
+  342.         NewKernelSegment == 0xffff)
+  343. >     fmemcpy(HMADest, HMASource, len);
+  344.     /* else it's the very first relocation: handled by kernel.asm */
+  345.   
+
+fdpp/fatdir.cc:346: error: NULL_DEREFERENCE
+  pointer `dmp` last assigned on line 345 could be null and is dereferenced at line 346, column 24.
+  344.     fnp = &fnode[0];
+  345.     dmp = &sda_tmp_dm;
+  346. >   fnp->f_dpb = get_dpb(dmp->dm_drive);
+  347.     if (media_check(fnp->f_dpb) < 0)
+  348.       return DE_NFILES;
+
+fdpp/dosfns.cc:368: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced at line 368, column 9.
+  366.     {
+  367.       length--;
+  368. >     c = *--fname;
+  369.       if (c == '/' || c == '\\' || c == ':') {
+  370.         fname++;
+
+fdpp/dosfns.cc:360: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced by call to `strlen()` at line 360, column 25.
+  358.   {
+  359.     /* find the end                                 */
+  360. >   REG unsigned length = fstrlen(fname);
+  361.     char c;
+  362.   
+
+fdpp/config.cc:401: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 401, column 14.
+  399.      */
+  400.   
+  401. >   base_seg = LoL->_first_mcb = FP_SEG(AlignParagraph((__FAR(BYTE)) DynLast() + 0x0f));
+  402.   
+  403.     if (Config.ebda2move)
+
+fdpp/task.cc:495: error: UNINITIALIZED_VALUE
+  The value read from env was never initialized.
+  493.       child_psp(mem, cu_psp, mem + asize);
+  494.   
+  495. >     fcbcode = patchPSP(mem - 1, env, exp, namep);
+  496.       /* set asize to end of segment */
+  497.       if (asize > 0x1000)
+
+fdpp/fcbfns.cc:429: error: NULL_DEREFERENCE
+  pointer `returned by operator_unsigned_char_*` could be null and is dereferenced at line 429, column 7.
+  427.   STATIC __FAR(fcb)ExtFcbToFcb(__FAR(xfcb) lpExtFcb)
+  428.   {
+  429. >   if (*((__FAR(UBYTE)) lpExtFcb) == 0xff)
+  430.       sda_lpFcb = &lpExtFcb->xfcb_fcb;
+  431.     else
+
+fdpp/config.cc:444: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 444, column 3.
+  442.   
+  443.     /* compute lastdrive ... */
+  444. >   LoL->_lastdrive = Config.cfgLastdrive;
+  445.     if (LoL->_lastdrive < LoL->_nblkdev)
+  446.       LoL->_lastdrive = LoL->_nblkdev;
+
+fdpp/nls.cc:446: error: NULL_DEREFERENCE
+  pointer `returned by operator_unsigned_short_*` could be null and is dereferenced at line 446, column 12.
+  444.       __FAR(UWORD)t= ((__FAR(struct nlsDBCS))getTable7(nlsInfo.actPkg))->dbcsTbl;
+  445.   
+  446. >     for (; *t != 0; ++t)
+  447.         if (ch >= (*t & 0xFF) && ch <= (*t >> 8))
+  448.           return TRUE;
+
+fdpp/main.cc:469: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 469, column 10.
+  467.   #endif
+  468.     "\n\n%s",
+  469. >          GET_PTR(MK_FP(FP_SEG(LoL), FP_OFF(LoL->_os_release))),
+  470.            MAJOR_RELEASE, MINOR_RELEASE, copyright);
+  471.   }
+
+fdpp/prf.cc:495: error: UNINITIALIZED_VALUE
+  The value read from s[_] was never initialized.
+  493.     while(i != 0)
+  494.     {                             /* print digits in reverse order */
+  495. >     put_console(s[--i]);
+  496.     }
+  497.   }
+
+fdpp/config.cc:512: error: DEAD_STORE
+  The value written to &kernel_seg (type unsigned short) is never used.
+  510.       MoveKernel(kernel_seg);
+  511.   
+  512. >     kernel_seg += hma_paras + 1;
+  513.   
+  514.       DebugPrintf(("kernel is low, start alloc at %x\n", kernel_seg));
+
+fdpp/nls.cc:517: error: NULL_DEREFERENCE
+  pointer `returned by operator_char_*` could be null and is dereferenced by call to `strlen()` at line 517, column 17.
+  515.   /* upcase a string */
+  516.   {
+  517. >   DosUpMem(str, fstrlen(str));
+  518.   }
+  519.   
+
+fdpp/dsk.cc:549: error: NULL_DEREFERENCE
+  pointer `pbpb` last assigned on line 545 could be null and is dereferenced by call to `memcpy()` at line 549, column 9.
+  547.               0 ? &pddt->ddt_defbpb : &pddt->ddt_bpb;
+  548.   #ifdef WITHFAT32
+  549. >         memcpy(pbpb, &gblp->gbio_bpb,
+  550.                   extended ? sizeof(gblp->gbio_bpb) : BPB_SIZEOF);
+  551.   #else
+
+fdpp/dsk.cc:549: error: NULL_DEREFERENCE
+  pointer `returned by operator_bpb_*` could be null and is dereferenced by call to `memcpy()` at line 549, column 9.
+  547.               0 ? &pddt->ddt_defbpb : &pddt->ddt_bpb;
+  548.   #ifdef WITHFAT32
+  549. >         memcpy(pbpb, &gblp->gbio_bpb,
+  550.                   extended ? sizeof(gblp->gbio_bpb) : BPB_SIZEOF);
+  551.   #else
+
+fdpp/dsk.cc:560: error: NULL_DEREFERENCE
+  pointer `returned by operator_ddtstruct_*` could be null and is dereferenced by call to `GenblockioAbs()` at line 560, column 15.
+  558.         {
+  559.           __FAR(struct gblkrw)rw = rp->r_rw;
+  560. >         ret = GenblockioAbs(pddt, LBA_WRITE, rw->gbrw_head, rw->gbrw_cyl,
+  561.                            rw->gbrw_sector, rw->gbrw_nsecs, rw->gbrw_buffer);
+  562.           if (ret != 0)
+
+fdpp/main.cc:533: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 533, column 7.
+  531.     __FAR(struct dpb)_dpb;
+  532.   
+  533. >   if (LoL->_nblkdev == 0)
+  534.       _dpb = LoL->_DPBp;
+  535.     else
+
+fdpp/config.cc:556: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 556, column 5.
+  554.       /* Note: since device drivers can change what is considered top of memory (e.g. move XBDA) we must requery */
+  555.       ram_top = init_oem();
+  556. >     LoL->_uppermem_root = ram_top * 64 - 1;
+  557.   
+  558.       /* create link mcb (below) */
+
+fdpp/nls.cc:547: error: NULL_DEREFERENCE
+  pointer `returned by operator_char_*` could be null and is dereferenced by call to `strlen()` at line 547, column 18.
+  545.   /* upcase a string for file names */
+  546.   {
+  547. >   DosUpFMem(str, fstrlen(str));
+  548.   }
+  549.   
+
+fdpp/task.cc:668: error: UNINITIALIZED_VALUE
+  The value read from env was never initialized.
+  666.         {
+  667.           DosMemFree(--mem);
+  668. >         DosMemFree(env);
+  669.         }
+  670.         return DE_INVLDDATA;
+
+fdpp/task.cc:720: error: UNINITIALIZED_VALUE
+  The value read from env was never initialized.
+  718.           {
+  719.             DosMemFree(--mem);
+  720. >           DosMemFree(env);
+  721.           }
+  722.           return DE_INVLDDATA;
+
+fdpp/task.cc:752: error: UNINITIALIZED_VALUE
+  The value read from env was never initialized.
+  750.       child_psp(mem, cu_psp, mem + asize);
+  751.   
+  752. >     fcbcode = patchPSP(mem - 1, env, exp, namep);
+  753.       exp->exec.stack =
+  754.         MK_FP(ExeHeader.exInitSS + start_seg, ExeHeader.exInitSP);
+
+fdpp/task.cc:726: error: UNINITIALIZED_VALUE
+  The value read from reloc[_] was never initialized.
+  724.         if (mode == OVERLAY)
+  725.         {
+  726. >         spot = MK_FP(reloc[1] + mem, reloc[0]);
+  727.           *spot += exp->load.reloc;
+  728.         }
+
+fdpp/task.cc:732: error: UNINITIALIZED_VALUE
+  The value read from reloc[_] was never initialized.
+  730.         {
+  731.           /*      spot = MK_FP(reloc[1] + mem + 0x10, reloc[0]); */
+  732. >         spot = MK_FP(reloc[1] + start_seg, reloc[0]);
+  733.           *spot += start_seg;
+  734.         }
+
+fdpp/fatfs.cc:654: error: NULL_DEREFERENCE
+  pointer `fnp` last assigned on line 648 could be null and is dereferenced by call to `find_free()` at line 654, column 7.
+  652.     /* Note that if we're in the root and we don't  */
+  653.     /* find an empty slot, we need to abort.        */
+  654. >   if (find_free(fnp) == 0)
+  655.     {
+  656.       if (fnp->f_dmp->dm_dircluster == 0)
+
+fdpp/main.cc:756: error: DEAD_STORE
+  The value written to &bootedFrom (type char const *) is never used.
+  754.   STATIC void CheckContinueBootFromHarddisk(void)
+  755.   {
+  756. >   const char *bootedFrom = "Floppy/CD";
+  757.     iregs r = {};
+  758.     int key;
+
+fdpp/main.cc:763: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 763, column 7.
+  761.       return;
+  762.   
+  763. >   if (LoL->_BootDrive >= 3)
+  764.     {
+  765.   #if 0
+
+fdpp/task.cc:778: error: NULL_DEREFERENCE
+  pointer `returned by operator_exec_blk_*` could be null and is dereferenced by call to `memcpy()` at line 778, column 3.
+  776.       return DE_INVLDFMT;
+  777.   
+  778. >   fmemcpy_n(&TempExeBlock, ep, sizeof(exec_blk));
+  779.     /* If file not found - free ram and return error        */
+  780.   
+
+fdpp/task.cc:788: error: UNINITIALIZED_VALUE
+  The value read from fd was never initialized.
+  786.   
+  787.     exe_header *eh = &ExeHeader;
+  788. >   rc = (WORD)DosRWSft(fd, sizeof(exe_header), eh, XFR_READ);
+  789.   
+  790.     if (rc == sizeof(exe_header) &&
+
+fdpp/task.cc:793: error: UNINITIALIZED_VALUE
+  The value read from fd was never initialized.
+  791.         (ExeHeader.exSignature == MAGIC || ExeHeader.exSignature == OLD_MAGIC))
+  792.     {
+  793. >     rc = DosExeLoader(lp, &TempExeBlock, mode, fd);
+  794.     }
+  795.     else if (rc != 0)
+
+fdpp/task.cc:797: error: UNINITIALIZED_VALUE
+  The value read from fd was never initialized.
+  795.     else if (rc != 0)
+  796.     {
+  797. >     rc = DosComLoader(lp, &TempExeBlock, mode, fd);
+  798.     }
+  799.   
+
+fdpp/task.cc:800: error: UNINITIALIZED_VALUE
+  The value read from fd was never initialized.
+  798.     }
+  799.   
+  800. >   DosCloseSft(fd, FALSE);
+  801.   
+  802.   
+
+fdpp/dsk.cc:801: error: NULL_DEREFERENCE
+  pointer `returned by operator_ddtstruct_*` could be null and is dereferenced by call to `tmark()` at line 801, column 3.
+  799.       return failure(E_FAILURE);
+  800.   
+  801. >   tmark(pddt);
+  802.     start = (rp->r_start != HUGECOUNT ? rp->r_start : rp->r_huge);
+  803.     pbpb = hd(pddt->ddt_descflags) ? &pddt->ddt_defbpb : &pddt->ddt_bpb;
+
+fdpp/dosfns.cc:828: error: NULL_DEREFERENCE
+  pointer `returned by operator_char_*` could be null and is dereferenced at line 828, column 9.
+  826.     */
+  827.     cdsp = NULL;
+  828. >   if ( !*DriveString || (*DriveString == '.') || (IS_SLASH(DriveString[0]) && !IS_SLASH(DriveString[1])) )
+  829.       cdsp = get_cds(default_drive);  /* if "" or .[\] or \[path] then use current drive */
+  830.     else if (DriveString[1] == ':')
+
+fdpp/config.cc:863: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 863, column 9.
+  861.   #endif
+  862.   
+  863. >     if (LoL->_InitEnvSeg)
+  864.       {
+  865.         char *p = MK_FP(LoL->_InitEnvSeg, 0);
+
+fdpp/config.cc:875: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 875, column 7.
+  873.     /* exit since we don't force the user to have one (but 1st      */
+  874.     /* also process MEMDISK passed config options if present).      */
+  875. >   if (LoL->_CfgDrive & 0x80)
+  876.     {
+  877.       char buf[] = "c:\\fdppconf.sys";
+
+fdpp/dsk.cc:885: error: NULL_DEREFERENCE
+  pointer `pbpb` last assigned on line 884 could be null and is dereferenced at line 885, column 17.
+  883.   
+  884.     const bpb *pbpb = hd(pddt->ddt_descflags) ? &pddt->ddt_defbpb : &pddt->ddt_bpb;
+  885. >   unsigned hs = pbpb->bpb_nsecs * pbpb->bpb_nheads;
+  886.     unsigned hsrem = (unsigned)(LBA_address % hs);
+  887.   
+
+fdpp/dsk.cc:913: warning: UNARY_MINUS_APPLIED_TO_UNSIGNED_EXPRESSION
+  A unary minus is applied to `expression dma_off` of type unsigned int at line 913, column 39.
+  911.   {
+  912.     unsigned dma_off = (UWORD)((FP_SEG(buffer) << 4) + FP_OFF(buffer));
+  913. >   unsigned sectors_to_dma_boundary = (dma_off == 0 ?
+  914.       0xffff / maxsecsize :
+  915.       (UWORD)(-dma_off) / maxsecsize);
+
+fdpp/dosfns.cc:934: error: NULL_DEREFERENCE
+  pointer `returned by operator__dmatch_*` could be null and is dereferenced by call to `memcpy()` at line 934, column 5.
+  932.     if (rc == SUCCESS)
+  933.     {
+  934. >     fmemcpy(dta, &sda_tmp_dm, 21);
+  935.       dmp->dm_attr_fnd = (BYTE) SearchDir.dir_attrib;
+  936.       dmp->dm_time = SearchDir.dir_time;
+
+fdpp/dosfns.cc:934: error: NULL_DEREFERENCE
+  pointer `returned by operator_void_*` could be null and is dereferenced by call to `memcpy()` at line 934, column 5.
+  932.     if (rc == SUCCESS)
+  933.     {
+  934. >     fmemcpy(dta, &sda_tmp_dm, 21);
+  935.       dmp->dm_attr_fnd = (BYTE) SearchDir.dir_attrib;
+  936.       dmp->dm_time = SearchDir.dir_time;
+
+fdpp/dosfns.cc:1024: error: NULL_DEREFERENCE
+  pointer `returned by operator__dmatch_*` could be null and is dereferenced by call to `memcpy()` at line 1024, column 3.
+  1022.     _printf("findnext: %d\n", dmp->dm_drive);
+  1023.   #endif
+  1024. >   fmemcpy(&sda_tmp_dm, dmp, 21);
+  1025.   
+  1026.     /* findnext will always fail on a volume id search or device name */
+
+fdpp/dosfns.cc:1279: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced at line 1279, column 9.
+  1277.        only the file name (not path nor extension) need be checked, "" == root or empty name
+  1278.      */
+  1279. >   if ( (*froot == '\0') ||
+  1280.          ((*froot=='.') && ((*(froot+1)=='\0') || (*(froot+2)=='\0' && *(froot+1)=='.')))
+  1281.        )
+
+fdpp/dosfns.cc:1280: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced at line 1280, column 70.
+  1278.      */
+  1279.     if ( (*froot == '\0') ||
+  1280. >        ((*froot=='.') && ((*(froot+1)=='\0') || (*(froot+2)=='\0' && *(froot+1)=='.')))
+  1281.        )
+  1282.     {
+
+fdpp/dosfns.cc:1280: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced at line 1280, column 70.
+  1278.      */
+  1279.     if ( (*froot == '\0') ||
+  1280. >        ((*froot=='.') && ((*(froot+1)=='\0') || (*(froot+2)=='\0' && *(froot+1)=='.')))
+  1281.        )
+  1282.     {
+
+fdpp/dosfns.cc:1280: error: NULL_DEREFERENCE
+  pointer `returned by operator_const_char_*` could be null and is dereferenced at line 1280, column 70.
+  1278.      */
+  1279.     if ( (*froot == '\0') ||
+  1280. >        ((*froot=='.') && ((*(froot+1)=='\0') || (*(froot+2)=='\0' && *(froot+1)=='.')))
+  1281.        )
+  1282.     {
+
+fdpp/initdisk.cc:1316: error: NULL_DEREFERENCE
+  pointer `returned by operator_char_*` could be null and is dereferenced by call to `memcpy()` at line 1316, column 3.
+  1314.   //  fmemcpy(int1e_table, *(__FAR(__FAR(char)))MK_FP(0, 0x1e*4), INT1E_TABLE_SIZE);
+  1315.     /* FDPP: wrong parse of the above */
+  1316. >   fmemcpy(int1e_table,  *(__FAR(__DOSFAR(char)))MK_FP(0, 0x1e*4), INT1E_TABLE_SIZE);
+  1317.     /* currently only 512 bytes per sector floppies are supported, log2(512/128)=2 */
+  1318.     int1e_table[3] = 2;
+
+fdpp/initdisk.cc:1386: error: UNINITIALIZED_VALUE
+  The value read from foundPartitions[_] was never initialized.
+  1384.       for (HardDrive = 0; HardDrive < nHardDisk; HardDrive++)
+  1385.       {
+  1386. >       ProcessDisk(SCAN_PRIMARY2, HardDrive, foundPartitions[HardDrive]);
+  1387.       }
+  1388.     }
+
+fdpp/initdisk.cc:1424: error: UNINITIALIZED_VALUE
+  The value read from foundPartitions[_] was never initialized.
+  1422.   
+  1423.         /* Process primary a 2nd time */
+  1424. >       ProcessDisk(SCAN_PRIMARY2, HardDrive, foundPartitions[HardDrive]);
+  1425.       }
+  1426.     }
+
+fdpp/config.cc:1332: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 1332, column 3.
+  1330.     _printf("Changing reported version to %d.%d\n", major, minor);
+  1331.   
+  1332. >   LoL->_os_setver_major = major; /* not the internal os_major */
+  1333.     LoL->_os_setver_minor = minor; /* not the internal os_minor */
+  1334.   }
+
+fdpp/dosfns.cc:1343: error: NULL_DEREFERENCE
+  pointer `returned by operator_char_*` could be null and is dereferenced by call to `strcpy()` at line 1343, column 5.
+  1341.     if (rc >= SUCCESS)
+  1342.     {
+  1343. >     fstrcpy(dest, PriPathName);
+  1344.       set_fcbname();
+  1345.     }
+
+fdpp/config.cc:1390: error: DEAD_STORE
+  The value written to &pLine (type char*) is never used.
+  1388.     BYTE UMBwanted = FALSE;
+  1389.   
+  1390. >   pLine = GetStringArg(pLine, szBuf);
+  1391.   
+  1392.     _strupr(szBuf);
+
+fdpp/config.cc:1431: error: DEAD_STORE
+  The value written to &pLine (type char*) is never used.
+  1429.   STATIC VOID DosData(char * pLine)
+  1430.   {
+  1431. >   pLine = GetStringArg(pLine, szBuf);
+  1432.     _strupr(szBuf);
+  1433.   
+
+fdpp/parsers/lex.yy.c:1515: warning: NULL_TEST_AFTER_DEREFERENCE
+  Pointer `yy_buffer_stack` was dereferenced at line 1514 and is tested for null at line 1515, column 7.
+  1513.        */
+  1514.   	yyensure_buffer_stack ();
+  1515. > 	if ( YY_CURRENT_BUFFER == new_buffer )
+  1516.   		return;
+  1517.   
+
+fdpp/parsers/lex.yy.c:1518: warning: NULL_TEST_AFTER_DEREFERENCE
+  Pointer `yy_buffer_stack` was dereferenced at line 1514 and is tested for null at line 1518, column 7.
+  1516.   		return;
+  1517.   
+  1518. > 	if ( YY_CURRENT_BUFFER )
+  1519.   		{
+  1520.   		/* Flush out information for old buffer. */
+
+fdpp/config.cc:1651: error: UNINITIALIZED_VALUE
+  The value read from entry.offset was never initialized.
+  1649.       if (entry.country != ctryCode || (entry.codepage != codePage && codePage))
+  1650.         continue;
+  1651. >     if (lseek(fd, entry.offset) == 0xffffffffL
+  1652.         || read(fd, &count, sizeof(count)) != sizeof(count)
+  1653.         || count > LENGTH(hdr)
+
+fdpp/config.cc:1642: error: UNINITIALIZED_VALUE
+  The value read from header.offset was never initialized.
+  1640.       goto ret;
+  1641.     }
+  1642. >   if (lseek(fd, header.offset) == 0xffffffffL
+  1643.       || read(fd, &entries, sizeof(entries)) != sizeof(entries))
+  1644.       goto err;
+
+fdpp/fatfs.cc:1594: error: NULL_DEREFERENCE
+  pointer `returned by operator_bpb_*` could be null and is dereferenced by call to `memcpy()` at line 1594, column 3.
+  1592.     bpb sbpb;
+  1593.   
+  1594. >   fmemcpy_n(&sbpb, bpbp, sizeof(sbpb));
+  1595.     for (shftcnt = 0; (sbpb.bpb_nsector >> shftcnt) > 1; shftcnt++)
+  1596.       ;
+
+fdpp/fatfs.cc:1605: error: UNINITIALIZED_VALUE
+  The value read from sbpb.bpb_huge was never initialized.
+  1603.     dpbp->dpb_fats = sbpb.bpb_nfat;
+  1604.     dpbp->dpb_dirents = sbpb.bpb_ndirent;
+  1605. >   size = sbpb.bpb_nsize == 0 ? sbpb.bpb_huge : (ULONG) sbpb.bpb_nsize;
+  1606.     dpbp->dpb_fatsize = sbpb.bpb_nfsect;
+  1607.     dpbp->dpb_dirstrt = dpbp->dpb_fatstrt + dpbp->dpb_fats * dpbp->dpb_fatsize;
+
+fdpp/fatfs.cc:1639: error: UNINITIALIZED_VALUE
+  The value read from sbpb.bpb_nfsect was never initialized.
+  1637.     if (extended)
+  1638.     {
+  1639. >     dpbp->dpb_xfatsize = sbpb.bpb_nfsect == 0 ? sbpb.bpb_xnfsect
+  1640.           : sbpb.bpb_nfsect;
+  1641.       dpbp->dpb_xcluster = UNKNCLUSTER;
+
+fdpp/fatfs.cc:1605: error: UNINITIALIZED_VALUE
+  The value read from sbpb.bpb_nsize was never initialized.
+  1603.     dpbp->dpb_fats = sbpb.bpb_nfat;
+  1604.     dpbp->dpb_dirents = sbpb.bpb_ndirent;
+  1605. >   size = sbpb.bpb_nsize == 0 ? sbpb.bpb_huge : (ULONG) sbpb.bpb_nsize;
+  1606.     dpbp->dpb_fatsize = sbpb.bpb_nfsect;
+  1607.     dpbp->dpb_dirstrt = dpbp->dpb_fatstrt + dpbp->dpb_fats * dpbp->dpb_fatsize;
+
+fdpp/fatfs.cc:1639: error: UNINITIALIZED_VALUE
+  The value read from sbpb.bpb_xnfsect was never initialized.
+  1637.     if (extended)
+  1638.     {
+  1639. >     dpbp->dpb_xfatsize = sbpb.bpb_nfsect == 0 ? sbpb.bpb_xnfsect
+  1640.           : sbpb.bpb_nfsect;
+  1641.       dpbp->dpb_xcluster = UNKNCLUSTER;
+
+fdpp/parsers/lex.yy.c:1605: error: NULL_DEREFERENCE
+  pointer `b` could be null and is dereferenced at line 1605, column 2.
+  1603.   	yy_flush_buffer( b );
+  1604.   
+  1605. > 	b->yy_input_file = file;
+  1606.   	b->yy_fill_buffer = 1;
+  1607.   
+
+fdpp/parsers/lex.yy.c:1663: warning: NULL_TEST_AFTER_DEREFERENCE
+  Pointer `yy_buffer_stack` was dereferenced at line 1660 and is tested for null at line 1663, column 7.
+  1661.   
+  1662.   	/* This block is copied from yy_switch_to_buffer. */
+  1663. > 	if ( YY_CURRENT_BUFFER )
+  1664.   		{
+  1665.   		/* Flush out information for old buffer. */
+
+fdpp/parsers/lex.yy.c:1672: warning: NULL_TEST_AFTER_DEREFERENCE
+  Pointer `yy_buffer_stack` was dereferenced at line 1660 and is tested for null at line 1672, column 6.
+  1670.   
+  1671.   	/* Only push if top exists. Otherwise, replace top. */
+  1672. > 	if (YY_CURRENT_BUFFER)
+  1673.   		(yy_buffer_stack_top)++;
+  1674.   	YY_CURRENT_BUFFER_LVALUE = new_buffer;
+
+fdpp/fatfs.cc:1680: error: NULL_DEREFERENCE
+  pointer `returned by operator_request_*` could be null and is dereferenced by call to `block_error()` at line 1680, column 15.
+  1678.       FOREVER
+  1679.       {
+  1680. >       switch (block_error(&MediaReqHdr, dpbp->dpb_unit, dpbp->dpb_device, 0))
+  1681.         {
+  1682.         case ABORT:
+
+fdpp/config.cc:1865: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 1865, column 13.
+  1863.     {
+  1864.       base = base_seg;
+  1865. >     start = LoL->_first_mcb;
+  1866.     }
+  1867.   
+
+fdpp/config.cc:1875: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 1875, column 9.
+  1873.     {
+  1874.       strcpy(szBuf, "C:\\");
+  1875. >     if (LoL->_DeviceDrive & 0x80)
+  1876.           szBuf[0] += LoL->_DeviceDrive & ~0x80;
+  1877.       off = 3;
+
+fdpp/config.cc:2016: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 2016, column 7.
+  2014.     size_t nPara = (nBytes + 15)/16;
+  2015.   
+  2016. >   if (LoL->_first_mcb == 0)
+  2017.     {
+  2018.       /* prealloc */
+
+fdpp/config.cc:2026: error: NULL_DEREFERENCE
+  pointer `returned by operator_void_*` could be null and is dereferenced by call to `memset()` at line 2026, column 3.
+  2024.       p = KernelAllocPara(nPara, type, NULL, mode);
+  2025.     }
+  2026. >   fmemset(p, 0, nBytes);
+  2027.     return p;
+  2028.   }
+
+fdpp/config.cc:2148: error: NULL_DEREFERENCE
+  pointer `returned by operator_void_*` could be null and is dereferenced by call to `memcpy()` at line 2148, column 3.
+  2146.   {
+  2147.     near_mcb->m_size = size;
+  2148. >   fmemcpy(MK_FP(seg, 0), near_mcb, sizeof(mcb));
+  2149.   }
+  2150.   
+
+fdpp/config.cc:2214: error: NULL_DEREFERENCE
+  pointer `returned by operator->` could be null and is dereferenced at line 2214, column 3.
+  2212.       buffers = wantedbuffers;
+  2213.   
+  2214. >   LoL->nbuffers = buffers;
+  2215.     LoL->inforecptr = &LoL->_firstbuf;
+  2216.     {
+
+fdpp/config.cc:2352: error: DEAD_STORE
+  The value written to &key (type int) is never used.
+  2350.   {
+  2351.     iregs r = {};
+  2352. >   int key = -1;
+  2353.     if (Menus == 0)
+  2354.       return;
+
+Summary of the reports
+
+                            NULL_DEREFERENCE: 88
+                         UNINITIALIZED_VALUE: 24
+                                  DEAD_STORE: 10
+                 NULL_TEST_AFTER_DEREFERENCE: 4
+  UNARY_MINUS_APPLIED_TO_UNSIGNED_EXPRESSION: 1
+          STATIC_INITIALIZATION_ORDER_FIASCO: 1
