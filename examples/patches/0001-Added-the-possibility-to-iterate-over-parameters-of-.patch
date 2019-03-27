@@ -1,0 +1,30 @@
+From 47611868d3c31e31d436b2eb02a3147b679b59ef Mon Sep 17 00:00:00 2001
+From: Andrea Bisbano <andrea.bisbano@bugseng.com>
+Date: Wed, 27 Mar 2019 09:51:42 +0100
+Subject: [PATCH] Added the possibility to iterate over parameters of any kind
+ of Function Decl. Note: this code may not work.
+
+---
+ infer/src/clang/cTL.ml | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/infer/src/clang/cTL.ml b/infer/src/clang/cTL.ml
+index cc59c0109..05f80d38a 100644
+--- a/infer/src/clang/cTL.ml
++++ b/infer/src/clang/cTL.ml
+@@ -786,6 +786,12 @@ let transition_via_parameters an =
+       List.map ~f:(fun d -> Decl d) omdi.omdi_parameters
+   | Stmt (ObjCMessageExpr (_, stmt_list, _, _)) ->
+       List.map ~f:(fun stmt -> Stmt stmt) stmt_list
++  | Decl (FunctionDecl (_, _, _, fdi))
++  | Decl (CXXMethodDecl (_, _, _, fdi, _))
++  | Decl (CXXConstructorDecl (_, _, _, fdi, _))
++  | Decl (CXXConversionDecl (_, _, _, fdi, _))
++  | Decl (CXXDestructorDecl (_, _, _, fdi, _)) ->
++      List.map ~f:(fun d -> Decl d) fdi.fdi_parameters
+   | _ ->
+       []
+ 
+-- 
+2.17.2 (Apple Git-113)
+
