@@ -1,0 +1,34 @@
+From ea9beca48a3909a7c7b3eefd6106dafcc920f60e Mon Sep 17 00:00:00 2001
+From: Andrea Bisbano <andrea.bisbano@bugseng.com>
+Date: Thu, 28 Mar 2019 17:16:35 +0100
+Subject: [PATCH 2/2] Added support for transition with method name also for
+ c/c++.
+
+---
+ infer/src/clang/cTL.ml | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/infer/src/clang/cTL.ml b/infer/src/clang/cTL.ml
+index 05f80d38a..179c20dc2 100644
+--- a/infer/src/clang/cTL.ml
++++ b/infer/src/clang/cTL.ml
+@@ -847,11 +847,12 @@ let transition_via_specified_parameter ~pos an key =
+       in
+       let arg_decl_opt = parameter_of_corresp_key omdi.omdi_parameters key in
+       node_opt_to_ast_node_list apply_decl arg_decl_opt
+-  | Decl (FunctionDecl (_, _, _, fdi))
+-  | Decl (CXXMethodDecl (_, _, _, fdi, _))
+-  | Decl (CXXConstructorDecl (_, _, _, fdi, _)) ->
++  | Decl (FunctionDecl (_, named_decl_info, _, fdi))
++  | Decl (CXXMethodDecl (_, named_decl_info, _, fdi, _))
++  | Decl (CXXConstructorDecl (_, named_decl_info, _, fdi, _)) ->
++      let method_name = named_decl_info.ni_name in
+       let parameter_of_corresp_key =
+-        if pos then parameter_of_corresp_pos else invalid_param_name_use ()
++        if pos then parameter_of_corresp_pos else parameter_of_corresp_name method_name ()
+       in
+       let arg_decl_opt = parameter_of_corresp_key fdi.fdi_parameters key in
+       node_opt_to_ast_node_list apply_decl arg_decl_opt
+-- 
+2.20.1 (Apple Git-117)
+
