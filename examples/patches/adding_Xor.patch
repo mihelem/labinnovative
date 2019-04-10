@@ -1,0 +1,472 @@
+From 4f68a9e82a650d7e47150006459b1779c3bf964e Mon Sep 17 00:00:00 2001
+From: Michele Miccinesi <michele.miccinesi@gmail.com>
+Date: Wed, 10 Apr 2019 12:28:18 +0200
+Subject: [PATCH 1/4] Adding XOR; even if it won't serve the purposes which
+ Professor stated: you cannot anyway extend CTL to cover the Exist Unique
+ case....
+
+---
+ infer/src/clang/cTL.ml  | 24 ++++++++++++++++++++++++
+ infer/src/clang/cTL.mli |  1 +
+ 2 files changed, 25 insertions(+)
+
+diff --git a/infer/src/clang/cTL.ml b/infer/src/clang/cTL.ml
+index cc59c0109..a708f58c6 100644
+--- a/infer/src/clang/cTL.ml
++++ b/infer/src/clang/cTL.ml
+@@ -1190,6 +1190,30 @@ and eval_AND an lcxt f1 f2 =
+   | None (* we short-circuit the AND evaluation *) ->
+       None
+ 
++(*
++and eval_XOR an lcxt f1 f2 =
++  match eval_formula f1 an lcxt with
++  | Some witness1 -> (
++    match eval_formula f2 an lcxt with
++    | None ->
++        Some witness1
++    | _ ->
++        None )
++  | None -> (
++    match eval_formula f2 an lcxt with
++    | Some witness2 ->
++        Some witness2
++    | _ ->
++        None )
++*)
++and eval_XOR an lcxt f1 f2 =
++  match (eval_formula f1 an lcxt, eval_formula f2 an lcxt) with
++  | (Some witness1, None) ->
++      Some witness1
++  | (None, Some witness2) ->
++      Some witness2
++  | _ ->
++      None
+ 
+ and eval_OR an lcxt f1 f2 = choose_witness_opt (eval_formula f1 an lcxt) (eval_formula f2 an lcxt)
+ 
+diff --git a/infer/src/clang/cTL.mli b/infer/src/clang/cTL.mli
+index ac3ac3132..e277de7eb 100644
+--- a/infer/src/clang/cTL.mli
++++ b/infer/src/clang/cTL.mli
+@@ -40,6 +40,7 @@ type t =
+   | Atomic of CPredicates.t  (** Atomic formula *)
+   | Not of t
+   | And of t * t
++  | Xor of t * t
+   | Or of t * t
+   | Implies of t * t
+   | InNode of ALVar.alexp list * t
+-- 
+2.20.1
+
+
+From d23c99085bf53ac721f797d2d5af5f7121bf9852 Mon Sep 17 00:00:00 2001
+From: Michele Miccinesi <michele.miccinesi@gmail.com>
+Date: Wed, 10 Apr 2019 12:34:47 +0200
+Subject: [PATCH 2/4] Last bit of adding_Xor.patch
+
+---
+ infer/src/clang/cTL.ml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/infer/src/clang/cTL.ml b/infer/src/clang/cTL.ml
+index a708f58c6..7b68693e8 100644
+--- a/infer/src/clang/cTL.ml
++++ b/infer/src/clang/cTL.ml
+@@ -1378,6 +1378,8 @@ and eval_formula f an lcxt : Ctl_parser_types.ast_node option =
+       match eval_formula f1 an lcxt with Some _ -> None | None -> Some an )
+     | And (f1, f2) ->
+         eval_AND an lcxt f1 f2
++    | Xor (f1, f2) ->
++        eval_XOR an lcxt f1 f2
+     | Or (f1, f2) ->
+         eval_OR an lcxt f1 f2
+     | Implies (f1, f2) ->
+-- 
+2.20.1
+
+
+From f743926de146c16241dbcda824324273741454d7 Mon Sep 17 00:00:00 2001
+From: Michele Miccinesi <michele.miccinesi@gmail.com>
+Date: Wed, 10 Apr 2019 19:56:12 +0200
+Subject: [PATCH 3/4] Trial patch to add XOR (not useful, but it's an excuse to
+ check where to add changes...) and EOX (Exist Once neXt)
+
+---
+ infer/src/clang/cTL.ml         | 72 ++++++++++++++++++++++------------
+ infer/src/clang/cTL.mli        |  1 +
+ infer/src/clang/ctl_lexer.mll  |  2 +
+ infer/src/clang/ctl_parser.mly | 13 +++++-
+ infer/src/clang/tableaux.ml    |  9 ++++-
+ 5 files changed, 70 insertions(+), 27 deletions(-)
+
+diff --git a/infer/src/clang/cTL.ml b/infer/src/clang/cTL.ml
+index 7b68693e8..e2f104780 100644
+--- a/infer/src/clang/cTL.ml
++++ b/infer/src/clang/cTL.ml
+@@ -52,10 +52,12 @@ type t =
+   | Not of t
+   | And of t * t
+   | Or of t * t
++  | Xor of t * t
+   | Implies of t * t
+   | InNode of ALVar.alexp list * t
+   | AX of transitions option * t
+   | EX of transitions option * t
++  | EOX of transitions option * t
+   | AF of transitions option * t
+   | EF of transitions option * t
+   | AG of transitions option * t
+@@ -78,6 +80,7 @@ let has_transition phi =
+   | AG (trans_opt, _)
+   | AU (trans_opt, _, _)
+   | EX (trans_opt, _)
++  | EOX (trans_opt, _)
+   | EF (trans_opt, _)
+   | EG (trans_opt, _)
+   | EU (trans_opt, _, _)
+@@ -175,6 +178,9 @@ module Debug = struct
+     | Or (phi1, phi2) ->
+         if full_print then Format.fprintf fmt "(%a OR %a)" pp_formula phi1 pp_formula phi2
+         else Format.pp_print_string fmt "(... OR ...)"
++    | Xor (phi1, phi2) ->
++        if full_print then Format.fprintf fmt "(%a XOR %a)" pp_formula phi1 pp_formula phi2
++        else Format.pp_print_string fmt "(... XOR ...)"
+     | Implies (phi1, phi2) ->
+         Format.fprintf fmt "(%a ==> %a)" pp_formula phi1 pp_formula phi2
+     | InNode (nl, phi) ->
+@@ -185,6 +191,8 @@ module Debug = struct
+         Format.fprintf fmt "AX[->%a](%a)" pp_transition trs pp_formula phi
+     | EX (trs, phi) ->
+         Format.fprintf fmt "EX[->%a](%a)" pp_transition trs pp_formula phi
++    | EOX (trs, phi) ->
++        Format.fprintf fmt "EOX[->%a](%a)" pp_transition trs pp_formula phi
+     | AF (trs, phi) ->
+         Format.fprintf fmt "AF[->%a](%a)" pp_transition trs pp_formula phi
+     | EF (trs, phi) ->
+@@ -497,6 +505,8 @@ module Debug = struct
+                     "(...) AND (...)"
+                 | Or _ when Int.equal num_children 2 ->
+                     "(...) OR (...)"
++                | Xor _ when Int.equal num_children 2 ->
++                    "(...) XOR (...)"
+                 | Implies _ when Int.equal num_children 2 ->
+                     "(...) ==> (...)"
+                 | Not _ ->
+@@ -950,6 +960,20 @@ let choose_witness_opt witness_opt1 witness_opt2 =
+   | None, None ->
+       None
+ 
++let choose_witness_opt_if_unique witness_opt1 witness_opt2 =
++  match (witness_opt1, witness_opt2) with
++  | Some witness1, None ->
++      Some witness1
++  | None, Some witness2 ->
++      Some witness2
++  | _ ->
++      None
++
++let is_some opt: bool = 
++  match opt with
++  | Some _ -> true
++  | _ -> false
++
+ 
+ (* Evaluation of formulas *)
+ (* evaluate an atomic formula (i.e. a predicate) on a ast node an and a
+@@ -1190,30 +1214,7 @@ and eval_AND an lcxt f1 f2 =
+   | None (* we short-circuit the AND evaluation *) ->
+       None
+ 
+-(*
+-and eval_XOR an lcxt f1 f2 =
+-  match eval_formula f1 an lcxt with
+-  | Some witness1 -> (
+-    match eval_formula f2 an lcxt with
+-    | None ->
+-        Some witness1
+-    | _ ->
+-        None )
+-  | None -> (
+-    match eval_formula f2 an lcxt with
+-    | Some witness2 ->
+-        Some witness2
+-    | _ ->
+-        None )
+-*)
+-and eval_XOR an lcxt f1 f2 =
+-  match (eval_formula f1 an lcxt, eval_formula f2 an lcxt) with
+-  | (Some witness1, None) ->
+-      Some witness1
+-  | (None, Some witness2) ->
+-      Some witness2
+-  | _ ->
+-      None
++and eval_XOR an lcxt f1 f2 = choose_witness_opt_if_unique (eval_formula f1 an lcxt) (eval_formula f2 an lcxt)
+ 
+ and eval_OR an lcxt f1 f2 = choose_witness_opt (eval_formula f1 an lcxt) (eval_formula f2 an lcxt)
+ 
+@@ -1268,6 +1269,27 @@ and eval_EX phi an lcxt trans =
+   | _ ->
+       witness_opt
+ 
++and eval_EOX phi an lcxt trans =
++  let succs =
++    match trans with
++    | Some l ->
++        next_state_via_transition an l
++    | None ->
++        Ctl_parser_types.get_direct_successor_nodes an
++  in
++  let witness_opt_list =
++    List.filter (fun node -> is_some (eval_formula phi node lcxt)) succs 
++  in
++  let witness_list =
++    List.map (fun (Some x) -> x) witness_opt_list
++  in
++  match (witness_list, trans) with
++  | [x], Some trans when not (is_transition_to_successor trans) ->
++      Some an (* We want to limit the witnesses to the successors of the original node. *)
++  | [x], None ->
++      Some x
++  | _ ->
++      None
+ 
+ (* an, lcxt |= E(phi1 U phi2) evaluated using the equivalence
+    an, lcxt |= E(phi1 U phi2) <=> an, lcxt |= phi2 or (phi1 and EX(E(phi1 U phi2)))
+@@ -1396,6 +1418,8 @@ and eval_formula f an lcxt : Ctl_parser_types.ast_node option =
+         eval_formula (Not (EF (trans, Not f1))) an lcxt
+     | EX (trans, f1) ->
+         eval_EX f1 an lcxt trans
++    | EOX (trans, f1) ->
++        eval_EOX f1 an lcxt trans
+     | AX (trans, f1) ->
+         eval_formula (Not (EX (trans, Not f1))) an lcxt
+     | EH (cl, phi) ->
+diff --git a/infer/src/clang/cTL.mli b/infer/src/clang/cTL.mli
+index e277de7eb..799afe04b 100644
+--- a/infer/src/clang/cTL.mli
++++ b/infer/src/clang/cTL.mli
+@@ -47,6 +47,7 @@ type t =
+   | AX of transitions option * t  (** AX phi <=> for all children of the current node phi holds *)
+   | EX of transitions option * t
+       (** EX phi <=> exist a child of the current node such that phi holds *)
++  | EOX of transitions option * t
+   | AF of transitions option * t
+       (** AF phi <=> for all path from the current node there is a descendant where phi holds *)
+   | EF of transitions option * t
+diff --git a/infer/src/clang/ctl_lexer.mll b/infer/src/clang/ctl_lexer.mll
+index d54d59144..ff082d405 100644
+--- a/infer/src/clang/ctl_lexer.mll
++++ b/infer/src/clang/ctl_lexer.mll
+@@ -36,6 +36,7 @@ rule token = parse
+   | "HOLDS-EVENTUALLY" { EF }
+   | "HOLDS-EVERYWHERE-EVENTUALLY" { AF }
+   | "HOLDS-NEXT" { EX }
++  | "HOLDS-ONCE-NEXT" { EOX }
+   | "HOLDS-EVERYWHERE-NEXT" { AX }
+   | "HOLDS-ALWAYS" { EG }
+   | "HOLDS-EVERYWHERE-ALWAYS" { AG }
+@@ -68,6 +69,7 @@ rule token = parse
+   | "]" { RIGHT_SQBRACE }
+   | "AND" { AND }
+   | "OR" { OR }
++  | "XOR" { XOR }
+   | "NOT" { NOT }
+   | "IMPLIES" { IMPLIES }
+   | "REGEXP" { REGEXP }
+diff --git a/infer/src/clang/ctl_parser.mly b/infer/src/clang/ctl_parser.mly
+index 07bf26da2..f5076be1a 100644
+--- a/infer/src/clang/ctl_parser.mly
++++ b/infer/src/clang/ctl_parser.mly
+@@ -38,6 +38,7 @@
+ %token EF
+ %token AF
+ %token EX
++%token EOX
+ %token AX
+ %token EG
+ %token AG
+@@ -68,6 +69,7 @@
+ %token RIGHT_SQBRACE
+ %token AND
+ %token OR
++%token XOR
+ %token NOT
+ %token IMPLIES
+ %token REGEXP
+@@ -91,10 +93,11 @@
+ 
+ /* associativity and priority (lower to higher) of operators */
+ %nonassoc IMPLIES
++%left XOR
+ %left OR
+ %left AND
+ %left AU, EU
+-%right NOT, AX, EX, AF, EF, EG, AG, EH
++%right NOT, AX, EX, EOX, AF, EF, EG, AG, EH
+ 
+ %start <CTL.al_file> al_file
+ %%
+@@ -281,6 +284,10 @@ formula:
+   | formula EX WITH_TRANSITION transition_label
+      { L.(debug Linters Verbose) "\tParsed EX WITH-TRANSITION '%a'@\n" CTL.Debug.pp_transition $4;
+        CTL.EX ($4, $1) }
++  | formula EOX { L.(debug Linters Verbose) "\tParsed EOX@\n"; CTL.EOX (None, $1) }
++  | formula EOX WITH_TRANSITION transition_label
++     { L.(debug Linters Verbose) "\tParsed EOX WITH-TRANSITION '%a'@\n" CTL.Debug.pp_transition $4;
++       CTL.EOX ($4, $1) }
+   | formula AX { L.(debug Linters Verbose) "\tParsed AX@\n"; CTL.AX (None, $1) }
+   | formula AX WITH_TRANSITION transition_label
+      { L.(debug Linters Verbose) "\tParsed AX WITH-TRANSITION '%a'@\n" CTL.Debug.pp_transition $4;
+@@ -299,12 +306,16 @@ formula:
+   | EX WITH_TRANSITION transition_label formula_with_paren
+     { L.(debug Linters Verbose) "\tParsed EX with transition '%a'@\n" CTL.Debug.pp_transition $3;
+       CTL.EX ($3, $4)}
++  | EOX WITH_TRANSITION transition_label formula_with_paren
++    { L.(debug Linters Verbose) "\tParsed EOX with transition '%a'@\n" CTL.Debug.pp_transition $3;
++      CTL.EOX ($3, $4)}
+   | AX WITH_TRANSITION transition_label formula_with_paren
+       { L.(debug Linters Verbose)
+         "\tParsed AX with transition '%a'@\n" CTL.Debug.pp_transition $3;
+         CTL.AX ($3, $4)}
+   | formula AND formula { L.(debug Linters Verbose) "\tParsed AND@\n"; CTL.And ($1, $3) }
+   | formula OR formula { L.(debug Linters Verbose) "\tParsed OR@\n"; CTL.Or ($1, $3) }
++  | formula XOR formula { L.(debug Linters Verbose) "\tParser XOR@\n"; CTL.Xor ($1, $3) }
+   | formula IMPLIES formula
+       { L.(debug Linters Verbose) "\tParsed IMPLIES@\n"; CTL.Implies ($1, $3) }
+   | NOT formula { L.(debug Linters Verbose) "\tParsed NOT@\n"; CTL.Not ($2) }
+diff --git a/infer/src/clang/tableaux.ml b/infer/src/clang/tableaux.ml
+index cc03b55a9..640647b69 100644
+--- a/infer/src/clang/tableaux.ml
++++ b/infer/src/clang/tableaux.ml
+@@ -120,6 +120,9 @@ let rec normalize phi =
+   | EX (trans, phi1) ->
+       let phi1' = normalize phi1 in
+       EX (trans, phi1')
++  | EOX (trans, phi1) ->
++      let phi1' = normalize phi1 in
++      EOX (trans, phi1')
+   | EF (trans, phi1) ->
+       let phi1' = normalize phi1 in
+       EF (trans, phi1')
+@@ -173,7 +176,7 @@ let formula_closure phi0 =
+         let cl1 = do_subformula phi1 in
+         let cl2 = do_subformula phi2 in
+         phi :: (cl1 @ cl2)
+-    | EX (_, phi1) | EF (_, phi1) | EG (_, phi1) | InNode (_, phi1) ->
++    | EX (_, phi1) | EOX (_, phi1) | EF (_, phi1) | EG (_, phi1) | InNode (_, phi1) ->
+         phi :: do_subformula phi1
+     | AG _ | AX _ | AF _ | AU _ | EH _ | ET _ | Implies _ ->
+         Logging.die InternalError "@\n  Failing with formula @\n   %a@\n" CTL.Debug.pp_formula phi
+@@ -248,6 +251,8 @@ let add_valid_formulae an checker lcxt cl =
+         add_in_set phi acc_set
+     | EX (trans, phi1) when exists_formula_in_successor_nodes an checker trans phi1 ->
+         add_in_set phi acc_set
++    | EOX (trans, phi1) when exists_formula_in_successor_nodes an checker trans phi1 ->
++        add_in_set phi acc_set
+     | EF (trans, phi1)
+       when is_valid phi1 acc_set || exists_formula_in_successor_nodes an checker trans phi ->
+         add_in_set phi acc_set
+@@ -284,7 +289,7 @@ let rec is_state_only_formula phi =
+       is_state_only_formula phi1 && is_state_only_formula phi2
+   | InNode (_, phi1) ->
+       is_state_only_formula phi1
+-  | AX _ | EX _ | AF _ | EF _ | AG _ | EG _ | AU _ | EU _ | EH _ | ET _ ->
++  | AX _ | EX _ | EOX _ | AF _ | EF _ | AG _ | EG _ | AU _ | EU _ | EH _ | ET _ ->
+       false
+ 
+ 
+-- 
+2.20.1
+
+
+From ba3f442dd2c64eda8a74d73616c40cadc1166298 Mon Sep 17 00:00:00 2001
+From: Michele Miccinesi <michele.miccinesi@gmail.com>
+Date: Wed, 10 Apr 2019 21:55:59 +0200
+Subject: [PATCH 4/4] Trying to add XOR (waste of time) and Single Child
+ detector EOX (waste of time)^2
+
+---
+ infer/src/clang/tableaux.ml | 28 ++++++++++++++++++++++++----
+ 1 file changed, 24 insertions(+), 4 deletions(-)
+
+diff --git a/infer/src/clang/tableaux.ml b/infer/src/clang/tableaux.ml
+index 640647b69..acc92f75f 100644
+--- a/infer/src/clang/tableaux.ml
++++ b/infer/src/clang/tableaux.ml
+@@ -107,6 +107,10 @@ let rec normalize phi =
+       let phi1' = normalize phi1 in
+       let phi2' = normalize phi2 in
+       Or (phi1', phi2')
++  | Xor (phi1, phi2) ->
++      let phi1' = normalize phi1 in
++      let phi2' = normalize phi2 in
++      Xor (phi1', phi2')
+   | And (phi1, phi2) ->
+       let phi1' = normalize phi1 in
+       let phi2' = normalize phi2 in
+@@ -172,7 +176,7 @@ let formula_closure phi0 =
+         [phi]
+     | Not phi1 ->
+         phi :: do_subformula phi1
+-    | And (phi1, phi2) | Or (phi1, phi2) | EU (_, phi1, phi2) | InObjCClass (phi1, phi2) ->
++    | And (phi1, phi2) | Or (phi1, phi2) | Xor (phi1, phi2) | EU (_, phi1, phi2) | InObjCClass (phi1, phi2) ->
+         let cl1 = do_subformula phi1 in
+         let cl2 = do_subformula phi2 in
+         phi :: (cl1 @ cl2)
+@@ -213,9 +217,23 @@ let exists_formula_in_successor_nodes an checker trans phi =
+       CTLFormulaSet.mem phi succ_sat_set )
+     succs
+ 
++let count_formula_in_successor_nodes an checker trans phi =
++  let succs = 
++    match trans with
++    | Some l ->
++        CTL.next_state_via_transition an l
++    | None ->
++        CTl_parser_types.get_direct_successor_nodes an
++  in
++  List.length (List.filter (fun an' ->
++      let node_pointer = Ctl_parser_types.ast_node_pointer an' in
++      let key = (node_pointer, checker) in
++      let succ_sat_set = get_node_valuation key in
++      CTLFormulaSet.mem phi succ_sat_set )
++    succs )
+ 
+ (* Given a node an and a closure cl, returns the subset of valid formulae of
+-   cl in an. The hipothesis is that you have constructed the set of valid formulae
++   cl in an. The hypothesis is that you have constructed the set of valid formulae
+ for the successors of the node an *)
+ let add_valid_formulae an checker lcxt cl =
+   let open CTL in
+@@ -245,13 +263,15 @@ let add_valid_formulae an checker lcxt cl =
+         add_in_set phi acc_set
+     | Or (phi1, phi2) when is_valid phi1 acc_set || is_valid phi2 acc_set ->
+         add_in_set phi acc_set
++    | Xor (phi1, phi2) when ( is_valid phi1 acc_set ) <> ( is_valid phi2 acc_set ) ->
++        add_in_set phi acc_set
+     | Not phi1 when not (is_valid phi1 acc_set) ->
+         add_in_set phi acc_set
+     | InNode (tl, phi1) when Ctl_parser_types.ast_node_has_kind tl an && is_valid phi1 acc_set ->
+         add_in_set phi acc_set
+     | EX (trans, phi1) when exists_formula_in_successor_nodes an checker trans phi1 ->
+         add_in_set phi acc_set
+-    | EOX (trans, phi1) when exists_formula_in_successor_nodes an checker trans phi1 ->
++    | EOX (trans, phi1) when (count_formula_in_successor_nodes an checker trans phi1) = 1 ->
+         add_in_set phi acc_set
+     | EF (trans, phi1)
+       when is_valid phi1 acc_set || exists_formula_in_successor_nodes an checker trans phi ->
+@@ -285,7 +305,7 @@ let rec is_state_only_formula phi =
+       (*L.(debug Linters Medium) "@\n ****** FOUND state_only_formula ***** @\n" ;*) true
+   | Not phi1 ->
+       is_state_only_formula phi1
+-  | And (phi1, phi2) | Or (phi1, phi2) | Implies (phi1, phi2) | InObjCClass (phi1, phi2) ->
++  | And (phi1, phi2) | Or (phi1, phi2) | Xor (phi1, phi2) | Implies (phi1, phi2) | InObjCClass (phi1, phi2) ->
+       is_state_only_formula phi1 && is_state_only_formula phi2
+   | InNode (_, phi1) ->
+       is_state_only_formula phi1
+-- 
+2.20.1
+
