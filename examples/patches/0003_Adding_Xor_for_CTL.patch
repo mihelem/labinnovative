@@ -1,0 +1,87 @@
+From 4f68a9e82a650d7e47150006459b1779c3bf964e Mon Sep 17 00:00:00 2001
+From: Michele Miccinesi <michele.miccinesi@gmail.com>
+Date: Wed, 10 Apr 2019 12:28:18 +0200
+Subject: [PATCH 1/2] Adding XOR; even if it won't serve the purposes which
+ Professor stated: you cannot anyway extend CTL to cover the Exist Unique
+ case....
+
+---
+ infer/src/clang/cTL.ml  | 24 ++++++++++++++++++++++++
+ infer/src/clang/cTL.mli |  1 +
+ 2 files changed, 25 insertions(+)
+
+diff --git a/infer/src/clang/cTL.ml b/infer/src/clang/cTL.ml
+index cc59c0109..a708f58c6 100644
+--- a/infer/src/clang/cTL.ml
++++ b/infer/src/clang/cTL.ml
+@@ -1190,6 +1190,30 @@ and eval_AND an lcxt f1 f2 =
+   | None (* we short-circuit the AND evaluation *) ->
+       None
+ 
++(*
++and eval_XOR an lcxt f1 f2 =
++  match eval_formula f1 an lcxt with
++  | Some witness1 -> (
++    match eval_formula f2 an lcxt with
++    | None ->
++        Some witness1
++    | _ ->
++        None )
++  | None -> (
++    match eval_formula f2 an lcxt with
++    | Some witness2 ->
++        Some witness2
++    | _ ->
++        None )
++*)
++and eval_XOR an lcxt f1 f2 =
++  match (eval_formula f1 an lcxt, eval_formula f2 an lcxt) with
++  | (Some witness1, None) ->
++      Some witness1
++  | (None, Some witness2) ->
++      Some witness2
++  | _ ->
++      None
+ 
+ and eval_OR an lcxt f1 f2 = choose_witness_opt (eval_formula f1 an lcxt) (eval_formula f2 an lcxt)
+ 
+diff --git a/infer/src/clang/cTL.mli b/infer/src/clang/cTL.mli
+index ac3ac3132..e277de7eb 100644
+--- a/infer/src/clang/cTL.mli
++++ b/infer/src/clang/cTL.mli
+@@ -40,6 +40,7 @@ type t =
+   | Atomic of CPredicates.t  (** Atomic formula *)
+   | Not of t
+   | And of t * t
++  | Xor of t * t
+   | Or of t * t
+   | Implies of t * t
+   | InNode of ALVar.alexp list * t
+-- 
+2.20.1
+
+
+From d23c99085bf53ac721f797d2d5af5f7121bf9852 Mon Sep 17 00:00:00 2001
+From: Michele Miccinesi <michele.miccinesi@gmail.com>
+Date: Wed, 10 Apr 2019 12:34:47 +0200
+Subject: [PATCH 2/2] Last bit of adding_Xor.patch
+
+---
+ infer/src/clang/cTL.ml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/infer/src/clang/cTL.ml b/infer/src/clang/cTL.ml
+index a708f58c6..7b68693e8 100644
+--- a/infer/src/clang/cTL.ml
++++ b/infer/src/clang/cTL.ml
+@@ -1378,6 +1378,8 @@ and eval_formula f an lcxt : Ctl_parser_types.ast_node option =
+       match eval_formula f1 an lcxt with Some _ -> None | None -> Some an )
+     | And (f1, f2) ->
+         eval_AND an lcxt f1 f2
++    | Xor (f1, f2) ->
++        eval_XOR an lcxt f1 f2
+     | Or (f1, f2) ->
+         eval_OR an lcxt f1 f2
+     | Implies (f1, f2) ->
+-- 
+2.20.1
