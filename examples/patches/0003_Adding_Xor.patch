@@ -1,0 +1,61 @@
+From 4f68a9e82a650d7e47150006459b1779c3bf964e Mon Sep 17 00:00:00 2001
+From: Michele Miccinesi <michele.miccinesi@gmail.com>
+Date: Wed, 10 Apr 2019 12:28:18 +0200
+Subject: [PATCH] Adding XOR; even if it won't serve the purposes which
+ Professor stated: you cannot anyway extend CTL to cover the Exist Unique
+ case....
+
+---
+ infer/src/clang/cTL.ml  | 24 ++++++++++++++++++++++++
+ infer/src/clang/cTL.mli |  1 +
+ 2 files changed, 25 insertions(+)
+
+diff --git a/infer/src/clang/cTL.ml b/infer/src/clang/cTL.ml
+index cc59c0109..a708f58c6 100644
+--- a/infer/src/clang/cTL.ml
++++ b/infer/src/clang/cTL.ml
+@@ -1190,6 +1190,30 @@ and eval_AND an lcxt f1 f2 =
+   | None (* we short-circuit the AND evaluation *) ->
+       None
+ 
++(*
++and eval_XOR an lcxt f1 f2 =
++  match eval_formula f1 an lcxt with
++  | Some witness1 -> (
++    match eval_formula f2 an lcxt with
++    | None ->
++        Some witness1
++    | _ ->
++        None )
++  | None -> (
++    match eval_formula f2 an lcxt with
++    | Some witness2 ->
++        Some witness2
++    | _ ->
++        None )
++*)
++and eval_XOR an lcxt f1 f2 =
++  match (eval_formula f1 an lcxt, eval_formula f2 an lcxt) with
++  | (Some witness1, None) ->
++      Some witness1
++  | (None, Some witness2) ->
++      Some witness2
++  | _ ->
++      None
+ 
+ and eval_OR an lcxt f1 f2 = choose_witness_opt (eval_formula f1 an lcxt) (eval_formula f2 an lcxt)
+ 
+diff --git a/infer/src/clang/cTL.mli b/infer/src/clang/cTL.mli
+index ac3ac3132..e277de7eb 100644
+--- a/infer/src/clang/cTL.mli
++++ b/infer/src/clang/cTL.mli
+@@ -40,6 +40,7 @@ type t =
+   | Atomic of CPredicates.t  (** Atomic formula *)
+   | Not of t
+   | And of t * t
++  | Xor of t * t
+   | Or of t * t
+   | Implies of t * t
+   | InNode of ALVar.alexp list * t
+-- 
+2.20.1
